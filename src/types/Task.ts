@@ -1,4 +1,4 @@
-type TagType = 'Faculdade' | 'Pessoal' | 'Programação';
+export type TagType = 'Faculdade' | 'Pessoal' | 'Programação' ;
 
 export type Task = {
     id: number,

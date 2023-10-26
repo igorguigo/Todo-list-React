@@ -1,3 +1,4 @@
+import { TagType } from "@/types/Task";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 
@@ -9,8 +10,29 @@ type Props = {
     closeModal: () => void;
 }
 
+const tags: TagType[] = ["Faculdade", "Pessoal", "Programação"];
+
+
 const Modal = ({ isOpen, closeModal }: Props) => {
   const [startDate, setStartDate] = useState<Date | null>();
+  const [taskName, setTaskName] = useState('');
+  const [taskTags, setTaskTags] = useState<TagType[]>([]);
+
+  const handleSelect = (value: string) => {
+    const selectedTag: TagType = value as TagType;
+    if (selectedTag && !taskTags.includes(selectedTag)) {
+      const newTags = [...taskTags, selectedTag];
+      setTaskTags(newTags);
+    }
+
+  }
+
+  const handleAddTask = (evento: Event) => {
+    evento.preventDefault();
+    console.log(startDate);
+    console.log(taskName);
+    console.log(taskTags);
+  }
 
   if (!isOpen) return null;
 
@@ -20,13 +42,20 @@ const Modal = ({ isOpen, closeModal }: Props) => {
       <div className="modal-container p-4 rounded-md bg-[#313638] border-[#454a4d] border-solid border-2 shadow-lg z-50 relative min-w-[500px] min-h-[200px]">
         <form action="" className="flex flex-col justify-between gap-y-5">
           <div className="inputs space-y-3">
-            <input type="text" placeholder='Digite o nome da tarefa' className='bg-transparent outline-none block' />
-            <input type="text" placeholder='Digite a categoria da tarefa' className='bg-transparent outline-none block' />
-            <DatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} placeholderText="Data de vencimento" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit placeholder:text-[#E8E9EB] max-w-[170px]" />
+            <input onChange={e => setTaskName(e.target.value)} type="text" placeholder='Digite o nome da tarefa' className='bg-transparent outline-none block' />
+            <select onChange={e => handleSelect(e.target.value)} id="categoria" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit block">
+              <option disabled selected>Categoria</option>
+              {
+                tags.map(tag =>      
+                  <option value={tag}>{tag}</option>
+                )
+              }
+            </select>
+            <DatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} placeholderText="Data de vencimento" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit placeholder:text-[#E8E9EB] max-w-[170px] block focus:outline-none focus:border-0" />
           </div>
           <div className="buttons flex justify-end gap-x-4">
             <button onClick={closeModal} className="px-3 py-2 text-[#E0DFD5] text-sm bg-[#313638] font-bold rounded-md border-[#454a4d] border-solid border-2">Cancelar</button>
-            <button className="px-3 py-2 bg-[#E0DFD5] text-sm text-[#313638] font-bold rounded-md">Adicionar tarefa</button>
+            <button onClick={e => handleAddTask(e)} className="px-3 py-2 bg-[#E0DFD5] text-sm text-[#313638] font-bold rounded-md">Adicionar tarefa</button>
           </div>
         </form>
         <button className="absolute top-[-0.5rem] right-[-0.5rem] bg-[#313638] rounded-full" onClick={closeModal}>
