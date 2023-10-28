@@ -6,6 +6,7 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 
 import { tasks as tasksData } from '@/data/tasks';
+import { Task } from '@/types/Task';
 
 export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -35,6 +36,15 @@ export default function Home() {
     setTasksChecked(updatedTasks.filter(task => task.checked).length);
   };
 
+  const addTask = (data: Task) => {
+    data.id = tasks[tasks.length - 1].id + 1;
+    tasks.push(data);
+    let updatedTasks = tasks;
+    setTasks(updatedTasks);
+    setTasksChecked(updatedTasks.filter(task => task.checked).length);
+  }
+
+ 
   return (
     <main className="w-full flex min-h-screen flex-col items-center p-24">
       <header className="w-full flex justify-center">
@@ -100,7 +110,7 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <Modal isOpen={modalIsOpen} closeModal={() => handleCloseModal()} />
+          <Modal isOpen={modalIsOpen} closeModal={() => handleCloseModal()} sendData={addTask} />
         </div>
       </section>
     </main>

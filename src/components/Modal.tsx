@@ -1,4 +1,4 @@
-import { TagType } from "@/types/Task";
+import { TagType, Task } from "@/types/Task";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 
@@ -8,15 +8,19 @@ import "react-datepicker/dist/react-datepicker.css";
 type Props = {
     isOpen: boolean;
     closeModal: () => void;
+    sendData: (task: Task) => void;
 }
 
 const tags: TagType[] = ["Faculdade", "Pessoal", "Programação"];
 
 
-const Modal = ({ isOpen, closeModal }: Props) => {
-  const [startDate, setStartDate] = useState<Date | null>();
+const Modal = ({ isOpen, closeModal, sendData }: Props) => {
   const [taskName, setTaskName] = useState('');
   const [taskTags, setTaskTags] = useState<TagType[]>([]);
+  const [startDate, setStartDate] = useState<Date | null>();
+  const [isNameValid, setIsNameValid] = useState(true);
+  const [areTagsValid, setAreTagsValid] = useState(true);
+  const [isDateValid, setIsDateValid] = useState(true);
 
   const handleSelect = (value: string) => {
     const selectedTag: TagType = value as TagType;
@@ -27,11 +31,47 @@ const Modal = ({ isOpen, closeModal }: Props) => {
 
   }
 
-  const handleAddTask = (evento: Event) => {
+  const handleAddTask = (evento:  React.FormEvent) => {
     evento.preventDefault();
-    console.log(startDate);
-    console.log(taskName);
-    console.log(taskTags);
+
+    if(!taskName){
+      setIsNameValid(false);
+      return;
+    }
+
+    setIsNameValid(true);
+
+    if(taskTags.length === 0){
+      setAreTagsValid(false);
+      return;
+    }
+
+    setAreTagsValid(true);
+
+    if(!startDate){
+      setIsDateValid(false);
+      return;
+    }
+
+    setIsDateValid(true);
+
+    const formattedDate = `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`;
+
+    let newTask: Task = {
+      id: 0,
+      title: taskName,
+      date: formattedDate,
+      tags: taskTags,
+      checked: false
+    }
+
+    sendData(newTask);
+    closeModal();
+    
+    setTaskName('');
+    setTaskTags([]);
+    setStartDate(null);
+
   }
 
   if (!isOpen) return null;
@@ -43,6 +83,9 @@ const Modal = ({ isOpen, closeModal }: Props) => {
         <form action="" className="flex flex-col justify-between gap-y-5">
           <div className="inputs space-y-3">
             <input onChange={e => setTaskName(e.target.value)} type="text" placeholder='Digite o nome da tarefa' className='bg-transparent outline-none block' />
+            {!isNameValid &&
+              <small className="block italic font-bold text-red-600">Insira um nome para a tarefa</small>
+            }
             <select onChange={e => handleSelect(e.target.value)} id="categoria" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit block">
               <option disabled selected>Categoria</option>
               {
@@ -51,7 +94,13 @@ const Modal = ({ isOpen, closeModal }: Props) => {
                 )
               }
             </select>
+            {!areTagsValid &&
+              <small className="block italic font-bold text-red-600">Insira uma categoria</small>
+            }
             <DatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} placeholderText="Data de vencimento" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit placeholder:text-[#E8E9EB] max-w-[170px] block focus:outline-none focus:border-0" />
+            {!isDateValid &&
+              <small className="block italic font-bold text-red-600">Insira uma data para a tarefa</small>
+            }
           </div>
           <div className="buttons flex justify-end gap-x-4">
             <button onClick={closeModal} className="px-3 py-2 text-[#E0DFD5] text-sm bg-[#313638] font-bold rounded-md border-[#454a4d] border-solid border-2">Cancelar</button>
