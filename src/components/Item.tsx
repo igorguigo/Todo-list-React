@@ -1,6 +1,6 @@
 import { Task } from "@/types/Task";
 
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 
 type Props = {
     data: Task;
@@ -36,7 +36,7 @@ const Item = ({ data, onItemClickedRadio, onClickDelete }: Props) => {
                 <div className="tags flex gap-x-3">
                     {
                         data.tags.map(tag => 
-                            <div className="text-sm px-4 py-1 text-[#E8E9EB] rounded-md font-medium h-fit bg-red-600">{tag}</div>
+                            <div key={useId()} className="text-sm px-4 py-1 text-[#E8E9EB] rounded-md font-medium h-fit bg-red-600">{tag}</div>
                         )
                     }
                     {/* <div className="text-sm px-4 py-1 text-[#E8E9EB] rounded-md font-medium h-fit bg-lime-600">Programação</div> */}

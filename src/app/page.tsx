@@ -1,9 +1,9 @@
 "use client"
 
 import Item from '@/components/Item';
-import Modal from '@/components/Modal';
+import Modal, { tags } from '@/components/Modal';
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useId } from 'react'
 
 import { tasks as tasksData } from '@/data/tasks';
 import { Task } from '@/types/Task';
@@ -12,6 +12,8 @@ export default function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [tasks, setTasks] = useState(tasksData);
   const [tasksChecked, setTasksChecked] = useState(tasks.filter(task => task.checked).length);
+
+  const dateFilter = ['Mais recentes', 'Mais antigos'];
 
   const handleOpenModal = () => {
     setModalIsOpen(true);
@@ -42,6 +44,21 @@ export default function Home() {
     let updatedTasks = tasks;
     setTasks(updatedTasks);
     setTasksChecked(updatedTasks.filter(task => task.checked).length);
+  }
+
+  const handleFilterByDate = (value: string) => {
+    if(!value){
+      return
+    }
+
+    if(value === 'Mais recentes'){
+      let updatedTasks = tasks.map(task => {
+          const [day, month, year] = task.date.split('/');
+          const jsDate = new Date(`${year}-${month - 1}-${day}`);      
+          task.date = jsDate;
+        }
+      ) 
+    }
   }
 
  
@@ -81,15 +98,21 @@ export default function Home() {
               <div className="flex gap-2">
                 <div className="filters flex items-center gap-5 mr-5">
                 <svg className='h-5' fill='#F09D51' xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"/></svg>
-                  <select id="countries" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit">
-                    <option selected>Data</option>
-                    <option value="recente">Mais recente</option>
-                    <option value="antigo">Mais antigo</option>
+                  <select onChange={e => handleFilterByDate(e.target.value)} id="data" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit">
+                    <option disabled selected>Data</option>
+                    {
+                      dateFilter.map(date =>      
+                        <option key={useId()} value={date}>{date}</option>
+                      )
+                    }
                   </select>
-                  <select id="countries" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit">
-                    <option selected>Categoria</option>
-                    <option value="pessoal">Pessoal</option>
-                    <option value="trabalho">Trabalho</option>
+                  <select id="categoria" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit">
+                    <option disabled selected>Categoria</option>
+                    {
+                      tags.map(tag =>      
+                        <option key={useId()} value={tag}>{tag}</option>
+                      )
+                    }
                   </select>
                 </div>
                 <div className="completed flex items-center gap-x-2">

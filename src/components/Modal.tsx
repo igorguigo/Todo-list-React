@@ -1,5 +1,5 @@
 import { TagType, Task } from "@/types/Task";
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,7 +11,7 @@ type Props = {
     sendData: (task: Task) => void;
 }
 
-const tags: TagType[] = ["Faculdade", "Pessoal", "Programação"];
+export const tags: TagType[] = ["Faculdade", "Pessoal", "Programação"];
 
 
 const Modal = ({ isOpen, closeModal, sendData }: Props) => {
@@ -90,12 +90,21 @@ const Modal = ({ isOpen, closeModal, sendData }: Props) => {
               <option disabled selected>Categoria</option>
               {
                 tags.map(tag =>      
-                  <option value={tag}>{tag}</option>
+                  <option key={useId()} value={tag}>{tag}</option>
                 )
               }
             </select>
             {!areTagsValid &&
               <small className="block italic font-bold text-red-600">Insira uma categoria</small>
+            }
+            {taskTags.length > 0 &&
+              <div className="flex gap-x-3">
+                {
+                  taskTags.map(tag =>      
+                    <span key={useId()} className="text-xs px-4 py-1 text-[#E8E9EB] rounded-md font-medium h-fit bg-red-600">{tag}</span>
+                  )
+                }
+              </div>
             }
             <DatePicker selected={startDate} onChange={(date: Date | null) => date && setStartDate(date)} placeholderText="Data de vencimento" className="px-4 py-1 bg-[#F06543] text-[#E8E9EB] rounded-md font-medium text-sm h-fit w-fit placeholder:text-[#E8E9EB] max-w-[170px] block focus:outline-none focus:border-0" />
             {!isDateValid &&
